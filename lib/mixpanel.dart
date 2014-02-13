@@ -5,8 +5,10 @@ import 'dart:js';
 class Mixpanel {
   dynamic get _mixpanel => context['mixpanel'];
 
+  bool get isEnabled => _mixpanel != null;
+
   void track(String eventName, [Map properties]) {
-    if (_mixpanel != null) {
+    if (isEnabled) {
       if (properties != null) {
         _mixpanel.callMethod('track', [eventName, new JsObject.jsify(properties)]);
       } else {
