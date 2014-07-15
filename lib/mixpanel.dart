@@ -1,19 +1,26 @@
 library mixpanel;
 
 import 'dart:js';
+import 'dart:async';
 
 class Mixpanel {
-  dynamic get _mixpanel => context['mixpanel'];
+  JsObject get _mixpanel => context['mixpanel'];
 
-  bool get isAvailable => _mixpanel != null;
+  bool get isAvailable => context.hasProperty('mixpanel');
 
-  void track(String eventName, [Map properties]) {
+  Future<bool> track(String eventName, [Map properties]) {
+    var completer = new Completer<bool>();
+
     if (isAvailable) {
-      if (properties != null) {
-        _mixpanel.callMethod('track', [eventName, new JsObject.jsify(properties)]);
-      } else {
-        _mixpanel.callMethod('track', [eventName]);
+      if (properties == null) {
+        properties = {};
       }
+
+      _mixpanel.callMethod('track',
+          [eventName, new JsObject.jsify(properties), (_, __) => completer.complete(true)]);
+    } else {
+      completer.complete(false);
     }
+    return completer.future;
   }
 }
