@@ -17,7 +17,9 @@ class Mixpanel {
       }
 
       _mixpanel.callMethod('track',
-          [eventName, new JsObject.jsify(properties), (_, __) => completer.complete(true)]);
+          [eventName, new JsObject.jsify(properties), ([_, __]) => completer.complete(true)]);
+      // Mixpanel doesn't call the callback with the same number of args consistently (1 or 2) and it isn't
+      //documented so we handle (0, 1, 2)
     } else {
       completer.complete(false);
     }
